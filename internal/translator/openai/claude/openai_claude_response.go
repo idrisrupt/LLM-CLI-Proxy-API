@@ -174,6 +174,7 @@ func convertOpenAIStreamingChunkToAnthropic(rawJSON []byte, param *ConvertOpenAI
 						"content_block": map[string]interface{}{
 							"type":     "thinking",
 							"thinking": "",
+							"signature": "skip_thought_signature_validator",
 						},
 					}
 					contentBlockStartJSON, _ := json.Marshal(contentBlockStart)
@@ -485,6 +486,7 @@ func convertOpenAINonStreamingToAnthropic(rawJSON []byte) []string {
 			contentBlocks = append(contentBlocks, map[string]interface{}{
 				"type":     "thinking",
 				"thinking": reasoningText,
+				"signature": "skip_thought_signature_validator",
 			})
 		}
 
@@ -716,6 +718,7 @@ func ConvertOpenAIResponseToClaudeNonStream(_ context.Context, _ string, origina
 						contentBlocks = append(contentBlocks, map[string]interface{}{
 							"type":     "thinking",
 							"thinking": thinkingBuilder.String(),
+							"signature": "skip_thought_signature_validator",
 						})
 						thinkingBuilder.Reset()
 					}
@@ -787,6 +790,7 @@ func ConvertOpenAIResponseToClaudeNonStream(_ context.Context, _ string, origina
 					contentBlocks = append(contentBlocks, map[string]interface{}{
 						"type":     "thinking",
 						"thinking": reasoningText,
+						"signature": "skip_thought_signature_validator",
 					})
 				}
 			}
