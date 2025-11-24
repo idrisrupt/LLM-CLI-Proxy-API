@@ -54,8 +54,22 @@ docker exec -it cli-proxy-api /CLIProxyAPI/CLIProxyAPI --codex-login # Codex
 docker exec -it cli-proxy-api /CLIProxyAPI/CLIProxyAPI --login   # Gemini
 ```
 
-## SDK Docs
+## Claude Code Integration
 
+To use this proxy with `claude-code`, edit your settings file at `~/.claude/settings.json` and add the following environment variables:
+
+```json
+"env": {
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:8317",
+    "ANTHROPIC_AUTH_TOKEN": "proxy",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gemini-2.5-pro",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "gpt-5.1-codex-max"
+  },
+```
+
+This will configure `claude-code` to send requests to the proxy.
+
+## SDK Docs
 - Usage: [docs/sdk-usage.md](docs/sdk-usage.md)
 - Advanced (executors & translators): [docs/sdk-advanced.md](docs/sdk-advanced.md)
 - Access: [docs/sdk-access.md](docs/sdk-access.md)
