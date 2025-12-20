@@ -54,6 +54,55 @@ docker exec -it cli-proxy-api /CLIProxyAPI/CLIProxyAPI --codex-login # Codex
 docker exec -it cli-proxy-api /CLIProxyAPI/CLIProxyAPI --login   # Gemini
 ```
 
+## Syncing Your Fork With Upstream
+
+Goal: pull upstream changes without losing your edits.
+
+Mental model:
+- `origin` = your fork
+- `upstream` = original repo
+- `main` mirrors upstream; your work lives on `feature/*` branches
+
+One-time setup (add upstream remote):
+```bash
+git remote add upstream https://github.com/router-for-me/CLIProxyAPI.git
+git remote -v
+```
+
+Standard workflow (safe and repeatable):
+1) Make sure your work is committed:
+```bash
+git status
+git add .
+git commit -m "My changes"
+```
+
+2) Update `main` to match upstream:
+```bash
+git checkout main
+git fetch upstream
+git merge upstream/main
+git push origin main
+```
+
+3) Reapply your work on top:
+```bash
+git checkout feature/my-changes
+git rebase main
+```
+
+If conflicts appear:
+```bash
+git status
+# fix conflicts
+git add .
+git rebase --continue
+```
+
+Notes:
+- Do not commit directly to `main`.
+- Build Docker images from your feature branch when you want your edits included.
+
 ## Claude Code Integration
 
 To use this proxy with `claude-code`, edit your settings file at `~/.claude/settings.json` and add the following environment variables:
