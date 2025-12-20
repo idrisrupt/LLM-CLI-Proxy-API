@@ -1,22 +1,10 @@
 # CLI Proxy API
 
-English | [中文](README_CN.md)
-
 A proxy server that provides OpenAI/Gemini/Claude/Codex compatible API interfaces for CLI.
 
 It now also supports OpenAI Codex (GPT models) and Claude Code via OAuth.
 
 So you can use local or multi-account CLI access with OpenAI(include Responses)/Gemini/Claude-compatible clients and SDKs.
-
-## Sponsor
-
-[![z.ai](https://assets.router-for.me/english.png)](https://z.ai/subscribe?ic=8JVLJQFSKB)
-
-This project is sponsored by Z.ai, supporting us with their GLM CODING PLAN.
-
-GLM CODING PLAN is a subscription service designed for AI coding, starting at just $3/month. It provides access to their flagship GLM-4.6 model across 10+ popular AI coding tools (Claude Code, Cline, Roo Code, etc.), offering developers top-tier, fast, and stable coding experiences.
-
-Get 10% OFF GLM CODING PLAN：https://z.ai/subscribe?ic=8JVLJQFSKB
 
 ## Overview
 
@@ -43,65 +31,96 @@ Get 10% OFF GLM CODING PLAN：https://z.ai/subscribe?ic=8JVLJQFSKB
 
 ## Getting Started
 
-CLIProxyAPI Guides: [https://help.router-for.me/](https://help.router-for.me/)
+### Run locally
+```bash
+# build binary
+GOOS=linux GOARCH=amd64 go build -o CLIProxyAPI ./cmd/server
 
-## Management API
+# run with default config (config.yaml in repo root)
+./CLIProxyAPI
+```
 
-see [MANAGEMENT_API.md](https://help.router-for.me/management/api)
+### Run with Docker
+```bash
+./docker-build.sh
+# start container
+docker compose up -d
+```
 
-## Amp CLI Support
+### Account logins (in running container)
+```bash
+docker exec -it cli-proxy-api /CLIProxyAPI/CLIProxyAPI --claude-login # Claude
+docker exec -it cli-proxy-api /CLIProxyAPI/CLIProxyAPI --codex-login # Codex
+docker exec -it cli-proxy-api /CLIProxyAPI/CLIProxyAPI --login   # Gemini
+```
 
-CLIProxyAPI includes integrated support for [Amp CLI](https://ampcode.com) and Amp IDE extensions, enabling you to use your Google/ChatGPT/Claude OAuth subscriptions with Amp's coding tools:
+## Syncing Your Fork With Upstream
 
-- Provider route aliases for Amp's API patterns (`/api/provider/{provider}/v1...`)
-- Management proxy for OAuth authentication and account features
-- Smart model fallback with automatic routing
-- **Model mapping** to route unavailable models to alternatives (e.g., `claude-opus-4.5` → `claude-sonnet-4`)
-- Security-first design with localhost-only management endpoints
+Goal: pull upstream changes without losing your edits.
 
-**→ [Complete Amp CLI Integration Guide](https://help.router-for.me/agent-client/amp-cli.html)**
+Mental model:
+- `origin` = your fork
+- `upstream` = original repo
+- `main` mirrors upstream; your work lives on `feature/*` branches
+
+One-time setup (add upstream remote):
+```bash
+git remote add upstream https://github.com/router-for-me/CLIProxyAPI.git
+git remote -v
+```
+
+Standard workflow (safe and repeatable):
+1) Make sure your work is committed:
+```bash
+git status
+git add .
+git commit -m "My changes"
+```
+
+2) Update `main` to match upstream:
+```bash
+git checkout main
+git fetch upstream
+git merge upstream/main
+git push origin main
+```
+
+3) Reapply your work on top:
+```bash
+git checkout feature/my-changes
+git rebase main
+```
+
+If conflicts appear:
+```bash
+git status
+# fix conflicts
+git add .
+git rebase --continue
+```
+
+Notes:
+- Do not commit directly to `main`.
+- Build Docker images from your feature branch when you want your edits included.
+
+## Claude Code Integration
+
+To use this proxy with `claude-code`, edit your settings file at `~/.claude/settings.json` and add the following environment variables:
+
+```json
+"env": {
+    "ANTHROPIC_BASE_URL": "http://127.0.0.1:8317",
+    "ANTHROPIC_AUTH_TOKEN": "proxy",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gemini-2.5-pro",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "gpt-5.1-codex-max"
+  },
+```
+
+This will configure `claude-code` to send requests to the proxy.
 
 ## SDK Docs
-
 - Usage: [docs/sdk-usage.md](docs/sdk-usage.md)
 - Advanced (executors & translators): [docs/sdk-advanced.md](docs/sdk-advanced.md)
 - Access: [docs/sdk-access.md](docs/sdk-access.md)
 - Watcher: [docs/sdk-watcher.md](docs/sdk-watcher.md)
 - Custom Provider Example: `examples/custom-provider`
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## Who is with us?
-
-Those projects are based on CLIProxyAPI:
-
-### [vibeproxy](https://github.com/automazeio/vibeproxy)
-
-Native macOS menu bar app to use your Claude Code & ChatGPT subscriptions with AI coding tools - no API keys needed
-
-### [Subtitle Translator](https://github.com/VjayC/SRT-Subtitle-Translator-Validator)
-
-Browser-based tool to translate SRT subtitles using your Gemini subscription via CLIProxyAPI with automatic validation/error correction - no API keys needed
-
-### [CCS (Claude Code Switch)](https://github.com/kaitranntt/ccs)
-
-CLI wrapper for instant switching between multiple Claude accounts and alternative models (Gemini, Codex, Antigravity) via CLIProxyAPI OAuth - no API keys needed
-
-### [ProxyPal](https://github.com/heyhuynhgiabuu/proxypal)
-
-Native macOS GUI for managing CLIProxyAPI: configure providers, model mappings, and endpoints via OAuth - no API keys needed.
-
-> [!NOTE]  
-> If you developed a project based on CLIProxyAPI, please open a PR to add it to this list.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
